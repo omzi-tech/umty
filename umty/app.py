@@ -16,7 +16,7 @@ from pathlib import Path
 from urllib.request import urlretrieve
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
-from datetime import datetime
+from datetime import datetime, timezone
 
 # -----------------------------------------------------------
 # CONFIG
@@ -44,7 +44,20 @@ st.markdown("""
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 
-.stApp {background: #0f0f0f;}
+.stApp {
+    background: radial-gradient(circle at top, #1a1a1a 0%, #0b0b0b 38%, #050505 100%);
+    color: #f5f5f5;
+}
+
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+[data-testid="stSidebar"] {
+    background: #111111;
+    border-right: 1px solid rgba(255,255,255,0.08);
+}
 
 .section-title {
     color: white;
@@ -53,34 +66,149 @@ footer {visibility: hidden;}
     margin: 20px 0 10px 0;
 }
 
-.movie-poster {
-    width: 150px;
-    height: 225px;
-    object-fit: cover;
-    border-radius: 8px;
-    transition: 0.25s;
+.hero-panel {
+    background: linear-gradient(135deg, rgba(229,9,20,0.18), rgba(15,23,42,0.7));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
 }
-.movie-poster:hover {transform: scale(1.07);}
+
+.premium-shell {
+    background: linear-gradient(135deg, rgba(17,17,17,0.96), rgba(24,24,27,0.88));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 28px;
+    padding: 1.2rem;
+    box-shadow: 0 26px 60px rgba(0,0,0,0.35);
+    margin-bottom: 1rem;
+}
+
+.premium-badge {
+    display: inline-block;
+    padding: 0.34rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(229,9,20,0.18);
+    border: 1px solid rgba(229,9,20,0.45);
+    color: #fca5a5;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.premium-title {
+    margin-top: 0.8rem;
+    font-size: clamp(2.1rem, 4vw, 4rem);
+    line-height: 1.02;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.05em;
+}
+
+.premium-subtitle {
+    color: #e5e7eb;
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 48rem;
+    margin-top: 0.8rem;
+}
+
+.premium-feature-grid {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+.premium-feature {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 0.9rem 0.8rem;
+}
+
+.premium-feature .label {
+    color: #9ca3af;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.premium-feature .value {
+    margin-top: 0.3rem;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.auth-shell {
+    max-width: 640px;
+    margin: 1rem auto 0 auto;
+    background: rgba(17,17,17,0.9);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    padding: 1.5rem;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.28);
+}
+
+.auth-shell .stTabs [role="tablist"] button {
+    color: #d1d5db;
+    font-weight: 600;
+}
+
+.auth-shell .stTabs [role="tablist"] button[aria-selected="true"] {
+    background: rgba(229,9,20,0.18);
+    color: white;
+    border-bottom: 2px solid #e50914;
+}
+
+.movie-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 0.8rem 0.6rem 0.75rem 0.6rem;
+    height: 100%;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.movie-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(229,9,20,0.4);
+}
+
+.movie-card img {
+    border-radius: 12px;
+    width: 100%;
+    max-width: 170px;
+    height: 240px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
 
 .movie-title {
-    color: #ddd;
-    font-size: 13px;
-    margin-top: 6px;
+    color: #f3f4f6;
+    font-size: 0.82rem;
+    margin-top: 0.75rem;
+    min-height: 2.2em;
     text-align: center;
-    max-width: 150px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-weight: 600;
+    line-height: 1.3;
 }
 
 .no-poster {
-    width:150px;
-    height:225px;
-    background:#333;
-    border-radius:8px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    color:#999;
+    width: 100%;
+    max-width: 170px;
+    height: 240px;
+    background: linear-gradient(160deg, #1d1d1d, #0f0f0f);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #9ca3af;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 0.8rem;
 }
 
 .top-nav {
@@ -112,6 +240,219 @@ footer {visibility: hidden;}
     gap:20px;
     overflow-x:auto;
     padding:10px 0;
+}
+
+.stButton > button {
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+    color: white;
+    font-weight: 600;
+}
+
+.stButton > button:hover {
+    border-color: rgba(229,9,20,0.45);
+    background: rgba(229,9,20,0.1);
+}
+
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #e50914, #b70010);
+    border: none;
+}
+
+.stMetric {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 0.6rem 0.8rem;
+}
+
+.stMetric > div {
+    color: white;
+}
+
+.sidebar-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.catalog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1.1rem 0 0.8rem 0;
+}
+
+.catalog-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: white;
+}
+
+.catalog-badge {
+    background: rgba(229,9,20,0.18);
+    border: 1px solid rgba(229,9,20,0.4);
+    color: #fca5a5;
+    border-radius: 999px;
+    padding: 0.28rem 0.55rem;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.stream-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 0.8rem;
+}
+
+.stream-pill {
+    padding: 0.5rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+    color: #e5e7eb;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.stream-pill.active {
+    background: linear-gradient(135deg, #e50914, #b70010);
+    border-color: rgba(229,9,20,0.7);
+    color: white;
+}
+
+.catalog-grid {
+    margin-top: 0.4rem;
+}
+
+.dashboard-shell {
+    background: linear-gradient(180deg, rgba(17,17,17,0.96), rgba(15,23,42,0.7));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    padding: 1.1rem 1.1rem 1.2rem 1.1rem;
+    box-shadow: 0 22px 50px rgba(0,0,0,0.2);
+    margin-bottom: 1.2rem;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.dashboard-kicker {
+    color: #fca5a5;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.dashboard-header h3 {
+    margin: 0.2rem 0 0 0;
+    font-size: 1.7rem;
+    color: white;
+    font-weight: 800;
+}
+
+.dashboard-chip {
+    background: rgba(34,197,94,0.14);
+    border: 1px solid rgba(34,197,94,0.35);
+    color: #bbf7d0;
+    border-radius: 999px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.stat-panel {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 0.9rem 0.8rem;
+}
+
+.stat-label {
+    display: block;
+    color: #9ca3af;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.stat-value {
+    display: block;
+    margin-top: 0.35rem;
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.table-panel {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 0.6rem;
+}
+
+.section-shell {
+    background: linear-gradient(180deg, rgba(17,17,17,0.9), rgba(24,24,27,0.72));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    padding: 1rem 1rem 0.8rem 1rem;
+    margin-top: 1rem;
+    box-shadow: 0 16px 35px rgba(0,0,0,0.18);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.9rem;
+}
+
+.section-kicker {
+    color: #fca5a5;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.section-header h3 {
+    margin: 0.25rem 0 0 0;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.section-pill {
+    background: rgba(229,9,20,0.12);
+    border: 1px solid rgba(229,9,20,0.35);
+    border-radius: 999px;
+    padding: 0.28rem 0.55rem;
+    color: #fca5a5;
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -159,7 +500,7 @@ def setup_db():
                email=excluded.email,
                password_hash=excluded.password_hash,
                role='admin'""",
-        ("Administrator", "admin@example.com", admin_username, admin_password_hash, datetime.utcnow().isoformat()),
+        ("Administrator", "admin@example.com", admin_username, admin_password_hash, datetime.now(timezone.utc).isoformat()),
     )
     c.execute(
         "UPDATE users SET name='Administrator', email='admin@example.com', password_hash=?, role='admin' WHERE username=?",
@@ -170,34 +511,57 @@ def setup_db():
 
 setup_db()
 
+def normalize_username(value):
+    return (value or "").strip()
+
+
 def create_user(name,email,username,password):
+    name = (name or "").strip()
+    email = (email or "").strip()
+    username = normalize_username(username)
+    password = (password or "").strip()
+
+    if not name or not email or not username or not password:
+        return False, "Please fill in all fields."
+
     try:
         conn = db_conn()
         c = conn.cursor()
         c.execute("INSERT INTO users(name,email,username,password_hash,created_at,role) VALUES (?,?,?,?,?,?)",
-                  (name,email,username,hash_pw(password),datetime.utcnow().isoformat(),"user"))
+                  (name, email, username, hash_pw(password), datetime.now(timezone.utc).isoformat(), "user"))
         conn.commit()
         conn.close()
         return True, ""
-    except:
+    except sqlite3.IntegrityError:
         return False, "Username already exists"
+    except Exception:
+        return False, "Unable to create account right now."
+
 
 def login(username,password):
+    username = normalize_username(username)
+    password = (password or "").strip()
+
+    if not username or not password:
+        return False, "Please enter your username and password."
+
     conn = db_conn()
     c = conn.cursor()
-    c.execute("SELECT id,name,email,password_hash,COALESCE(role,'user') FROM users WHERE username=?",(username,))
+    c.execute("SELECT id,name,email,password_hash,COALESCE(role,'user') FROM users WHERE username=?", (username,))
     row = c.fetchone()
     conn.close()
-    if not row: return False,"No such user"
-    uid,name,email,pwh,role = row
-    if pwh != hash_pw(password): return False,"Wrong password"
-    return True, {"id":uid,"name":name,"email":email,"username":username,"role":role}
+    if not row:
+        return False, "No such user"
+    uid, name, email, pwh, role = row
+    if pwh != hash_pw(password):
+        return False, "Wrong password"
+    return True, {"id": uid, "name": name, "email": email, "username": username, "role": role}
 
 def add_favorite(uid,title):
     conn = db_conn()
     c = conn.cursor()
     c.execute("INSERT INTO favorites(user_id,title,added_at) VALUES (?,?,?)",
-              (uid,title,datetime.utcnow().isoformat()))
+              (uid,title,datetime.now(timezone.utc).isoformat()))
     conn.commit(); conn.close()
 
 def get_favorites(uid):
@@ -344,20 +708,22 @@ def render_row(titles, section="main"):
     for i, title in enumerate(titles):
         with cols[i % len(cols)]:
             poster = fetch_poster(title)
+            st.markdown('<div class="movie-card">', unsafe_allow_html=True)
             if poster:
-                st.image(poster, width=170)
+                st.image(poster, use_container_width=True)
             else:
-                st.markdown(f"<div style='height:225px; background:#1f1f1f; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#888;'>No poster</div>", unsafe_allow_html=True)
+                st.markdown('<div class="no-poster">No poster</div>', unsafe_allow_html=True)
 
-            st.caption(title)
+            st.markdown(f'<div class="movie-title">{title}</div>', unsafe_allow_html=True)
             button_key = f"save_{section}_{slugify(title)}_{i}"
-            if st.button("Save", key=button_key):
+            if st.button("Save", key=button_key, use_container_width=True):
                 if not st.session_state.user:
                     st.session_state.pending_favorite = title
                     st.info("Please log in to save favorites.")
                 else:
                     add_favorite(st.session_state.user["id"], title)
                     st.success(f"Saved: {title}")
+            st.markdown('</div>', unsafe_allow_html=True)
 
 
 def render_admin_dashboard():
@@ -366,20 +732,36 @@ def render_admin_dashboard():
         st.caption("No users yet.")
         return
 
-    st.subheader("Admin dashboard", divider="gray")
+    st.markdown("<div class='dashboard-shell'>", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class='dashboard-header'>
+            <div>
+                <div class='dashboard-kicker'>Control center</div>
+                <h3>Admin dashboard</h3>
+            </div>
+            <div class='dashboard-chip'>Live</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     admin_cols = st.columns(3)
     with admin_cols[0]:
-        st.metric("Total users", int(len(users)))
+        st.markdown(f"<div class='stat-panel'><span class='stat-label'>Total users</span><span class='stat-value'>{int(len(users))}</span></div>", unsafe_allow_html=True)
     with admin_cols[1]:
-        st.metric("Admins", int((users["role"] == "admin").sum()))
+        st.markdown(f"<div class='stat-panel'><span class='stat-label'>Admins</span><span class='stat-value'>{int((users['role'] == 'admin').sum())}</span></div>", unsafe_allow_html=True)
     with admin_cols[2]:
-        st.metric("Saved titles", int(users["favorites"].sum()))
+        st.markdown(f"<div class='stat-panel'><span class='stat-label'>Saved titles</span><span class='stat-value'>{int(users['favorites'].sum())}</span></div>", unsafe_allow_html=True)
 
+    st.markdown("<div class='table-panel'>", unsafe_allow_html=True)
     st.dataframe(
         users.rename(columns={"username": "Username", "role": "Role", "favorites": "Favorites"}),
         use_container_width=True,
         hide_index=True,
     )
+    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # -----------------------------------------------------------
@@ -409,7 +791,7 @@ if not st.session_state.user:
 
     st.markdown(
         """
-        <div style='background:linear-gradient(135deg,#111111 0%,#1a1a1a 45%,#0f172a 100%); padding:2.5rem; border-radius:20px; border:1px solid #2a2a2a; margin-bottom:1.5rem;'>
+        <div class='hero-panel'>
             <div style='font-size:2.8rem; font-weight:800; color:#e50914; letter-spacing:0.04em;'>umty</div>
             <div style='font-size:1.1rem; color:#d1d5db; margin-top:0.6rem;'>Your next movie night starts here.</div>
         </div>
@@ -417,17 +799,19 @@ if not st.session_state.user:
         unsafe_allow_html=True,
     )
 
+    st.markdown('<div class="auth-shell">', unsafe_allow_html=True)
     login_tab, signup_tab = st.tabs(["Sign in", "Create account"])
 
     with login_tab:
         with st.form("landing_login_form"):
             username = st.text_input("Username", key="landing_username")
             password = st.text_input("Password", type="password", key="landing_password")
-            submitted = st.form_submit_button("Sign in", use_container_width=True)
+            submitted = st.form_submit_button("Sign in", type="primary")
             if submitted:
                 ok, res = login(username, password)
                 if ok:
                     st.session_state.user = res
+                    st.success(f"Welcome back, {res['username']}!")
                     st.rerun()
                 else:
                     st.error(res)
@@ -439,7 +823,7 @@ if not st.session_state.user:
             new_username = st.text_input("Username", key="landing_new_username")
             new_password = st.text_input("Password", type="password", key="landing_new_password")
             confirm_password = st.text_input("Confirm password", type="password", key="landing_confirm_password")
-            signup = st.form_submit_button("Create account", use_container_width=True)
+            signup = st.form_submit_button("Create account", type="primary")
             if signup:
                 if not all([name, email, new_username, new_password, confirm_password]):
                     st.error("Please fill in every field.")
@@ -452,6 +836,7 @@ if not st.session_state.user:
                     else:
                         st.error(msg)
 
+    st.markdown('</div>', unsafe_allow_html=True)
     st.stop()
 
 # -----------------------------------------------------------
@@ -459,6 +844,7 @@ if not st.session_state.user:
 # -----------------------------------------------------------
 
 with st.sidebar:
+    st.markdown("<div class='sidebar-card'>", unsafe_allow_html=True)
     st.markdown("## :material/person: Account")
 
     if st.session_state.user:
@@ -517,11 +903,13 @@ with st.sidebar:
                         st.success("Account created successfully.")
                     else:
                         st.error(msg)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------------
 # HOME PAGE
 # -----------------------------------------------------------
 
+base_titles = ["The Matrix", "Inception", "Fight Club", "Pulp Fiction", "Avatar", "Sabrina", "The Dark Knight", "Interstellar"]
 if st.session_state.user:
     welcome_name = st.session_state.user["name"] or st.session_state.user["username"]
     st.title(f"Welcome back, {welcome_name}", anchor=False)
@@ -530,16 +918,47 @@ else:
 
 st.caption("Trending movies, personal picks, and favorites built for your next watch night.")
 
-with st.container(border=True):
-    hero_cols = st.columns([1.4, 1])
+featured_titles = base_titles[:3]
+feature_title = featured_titles[0] if featured_titles else "The Matrix"
+feature_poster = fetch_poster(feature_title)
+
+with st.container():
+    hero_cols = st.columns([1.6, 1])
     with hero_cols[0]:
-        st.markdown("### Now streaming")
-        st.markdown("Discover your next favorite film, build a watchlist, and let your saved picks power smarter recommendations.")
+        st.markdown(
+            """
+            <div class='premium-shell'>
+                <div class='premium-badge'>Featured tonight</div>
+                <div class='premium-title'>""" + feature_title + """</div>
+                <div class='premium-subtitle'>Discover your next favorite film, build a watchlist, and let your saved picks power smarter recommendations.</div>
+                <div class='premium-feature-grid'>
+                    <div class='premium-feature'>
+                        <div class='label'>Movies</div>
+                        <div class='value'>""" + f"{len(movies_df):,}" + """</div>
+                    </div>
+                    <div class='premium-feature'>
+                        <div class='label'>Users</div>
+                        <div class='value'>""" + f"{ratings_df['userId'].nunique():,}" + """</div>
+                    </div>
+                    <div class='premium-feature'>
+                        <div class='label'>Top rated</div>
+                        <div class='value'>""" + str(int(ratings_df["rating"].max())) + """</div>
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         if st.session_state.user:
-            st.markdown("Your account is ready. Pick a mood, save your favorites, and keep the night rolling.")
+            st.markdown("<div style='margin-top: 0.8rem; color: #e5e7eb;'>Your account is ready. Pick a mood, save your favorites, and keep the night rolling.</div>", unsafe_allow_html=True)
         else:
-            st.markdown("Sign in to unlock personalized suggestions, favorites, and a cleaner movie night experience.")
+            st.markdown("<div style='margin-top: 0.8rem; color: #e5e7eb;'>Sign in to unlock personalized suggestions, favorites, and a cleaner movie night experience.</div>", unsafe_allow_html=True)
     with hero_cols[1]:
+        if feature_poster:
+            st.image(feature_poster, width=320)
+        else:
+            st.markdown("<div style='height: 360px; background: linear-gradient(160deg, #1d1d1d, #0f0f0f); border-radius: 20px; display:flex; align-items:center; justify-content:center; color:#9ca3af; font-size:1rem;'>No poster</div>", unsafe_allow_html=True)
+
         st.markdown("#### Quick stats")
         stats_cols = st.columns(3)
         with stats_cols[0]:
@@ -563,7 +982,22 @@ else:
     mask = movies_df["genres"].str.contains(selected_category, case=False, na=False)
     titles = movies_df[mask]["title"].tolist()[:25]
 
-st.subheader(f"{selected_category} picks", divider="gray")
+st.markdown("""
+<div class='section-shell'>
+    <div class='section-header'>
+        <div>
+            <div class='section-kicker'>Catalog</div>
+            <h3>Streaming catalog</h3>
+        </div>
+        <div class='section-pill'>Now playing</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+pill_html = "".join(
+    f"<span class='stream-pill {'active' if cat == selected_category else ''}'>{cat}</span>" for cat in categories
+)
+st.markdown(f"<div class='stream-pills'>{pill_html}</div>", unsafe_allow_html=True)
 render_row(titles, section="category")
 
 # -----------------------------------------------------------
@@ -571,7 +1005,20 @@ render_row(titles, section="category")
 # -----------------------------------------------------------
 
 if st.session_state.user:
-    st.subheader("AI recommendations", divider="gray")
+    st.markdown(
+        """
+        <div class='section-shell'>
+            <div class='section-header'>
+                <div>
+                    <div class='section-kicker'>For you</div>
+                    <h3>AI recommendations</h3>
+                </div>
+                <div class='section-pill'>Smart picks</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     favs = get_favorites(st.session_state.user["id"])
     if favs:
         rec = []
@@ -583,11 +1030,37 @@ if st.session_state.user:
     else:
         st.caption("Add a few favorites to unlock personalized recommendations.")
 else:
-    st.subheader("Favorites", divider="gray")
+    st.markdown(
+        """
+        <div class='section-shell'>
+            <div class='section-header'>
+                <div>
+                    <div class='section-kicker'>Favorites</div>
+                    <h3>Saved watchlist</h3>
+                </div>
+                <div class='section-pill'>Login required</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.caption("Log in to save your watchlist and see recommendations tailored to your taste.")
 
 if st.session_state.user:
-    st.subheader("Your favorites", divider="gray")
+    st.markdown(
+        """
+        <div class='section-shell'>
+            <div class='section-header'>
+                <div>
+                    <div class='section-kicker'>My list</div>
+                    <h3>Your favorites</h3>
+                </div>
+                <div class='section-pill'>Saved</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     favs = get_favorites(st.session_state.user["id"])
     if favs:
         render_row(favs, section="favorites")
